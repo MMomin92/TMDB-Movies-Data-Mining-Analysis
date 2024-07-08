@@ -1,0 +1,123 @@
+# Importing libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+import statsmodels.api as sm
+from mlxtend.frequent_patterns import apriori, association_rules
+
+# Data Loading
+movies_metadata = pd.read_csv('movies_metadata.csv', low_memory=False)
+credits = pd.read_csv('credits.csv')
+
+# Data Cleaning
+# Handling missing values and data types
+movies_metadata['budget'] = movies_metadata['budget'].replace(0, np.nan)
+movies_metadata['revenue'] = movies_metadata['revenue'].replace(0, np.nan)
+movies_metadata.dropna(subset=['budget', 'revenue'], inplace=True)
+
+# Merging datasets
+movies = pd.merge(movies_metadata, credits, on='id')
+
+# Feature Engineering
+# Parsing genres
+movies['genres'] = movies['genres'].apply(lambda x: [i['name'] for i in eval(x)])
+
+# Parsing release year
+movies['release_date'] = pd.to_datetime(movies['release_date'], errors='coerce')
+movies['release_year'] = movies['release_date'].dt.year
+
+# Data Analysis
+# Linear Regression Analysis
+X = movies[['budget', 'popularity', 'runtime']]
+y = movies['revenue']
+
+# Split the data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the model
+lm = LinearRegression()
+lm.fit(X_train, y_train)
+
+# Predict and evaluate
+y_pred = lm.predict(X_test)
+print(f'Mean Squared Error: {mean_squared_error(y_test, y_pred)}')
+print(f'R-squared: {r2_score(y_test, y_pred)}')
+
+# Visualization
+# Scatter plot for budget vs revenue
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='budget', y='revenue', data=movies)
+plt.title('Budget vs Revenue')
+plt.xlabel('Budget')
+plt.ylabel('Revenue')
+plt.show()
+
+# Scatter plot for popularity vs revenue
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='popularity', y='revenue', data=movies)
+plt.title('Popularity vs Revenue')
+plt.xlabel('Popularity')
+plt.ylabel('Revenue')
+plt.show()
+
+# Box plot for genres vs revenue
+plt.figure(figsize=(14, 8))
+sns.boxplot(x='genres', y='revenue', data=movies.explode('genres'))
+plt.title('Genres vs Revenue')
+plt.xlabel('Genres')
+plt.ylabel('Revenue')
+plt.xticks(rotation=90)
+plt.show()
+
+# Multiple Linear Regression using statsmodels
+X_sm = sm.add_constant(X)  # adding a constant
+model = sm.OLS(y, X_sm).fit()
+print(model.summary())
+
+# Decision Tree Analysis
+# Define the feature set and target variable
+features = ['budget', 'vote_average', 'popularity', 'runtime']
+target = 'profit_true'  # Assuming 'profit_true' is a binary column indicating profitability
+
+# Prepare the data
+movies['profit_true'] = movies['revenue'] > movies['budget']  # Example criteria for profit
+X = movies[features]
+y = movies[target].astype(int)
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Build the Decision Tree
+clf = DecisionTreeClassifier(criterion='entropy', max_depth=5, min_samples_split=3)
+clf.fit(X_train, y_train)
+
+# Visualize the Decision Tree
+plt.figure(figsize=(20, 10))
+plot_tree(clf, filled=True, feature_names=features, class_names=['Not Profitable', 'Profitable'], rounded=True)
+plt.show()
+
+# Evaluate the model
+y_train_pred = clf.predict(X_train)
+y_test_pred = clf.predict(X_test)
+print(f'Training Accuracy: {accuracy_score(y_train, y_train_pred)}')
+print(f'Test Accuracy: {accuracy_score(y_test, y_test_pred)}')
+
+# Association Rule Mining
+# Preparing data for association rule mining
+movies_exploded = movies.explode('genres')
+movies_onehot = movies_exploded.groupby(['id', 'genres']).size().unstack(fill_value=0)
+
+# Applying Apriori algorithm
+frequent_itemsets = apriori(movies_onehot, min_support=0.01, use_colnames=True)
+rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
+
+# Display association rules
+print(rules[['antecedents', 'consequents', 'support', 'confidence', 'lift']])
+
+# Save cleaned and processed data for future use
+movies.to_csv('cleaned_movies_data.csv', index=False)
