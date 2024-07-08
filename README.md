@@ -42,7 +42,7 @@ Our analysis revealed several key insights:
 
 ## Graphic on Findings
 
-![Comprehensive Visualization](link-to-graphic)
+![Graphic]([link-to-graphic](https://github.com/MMomin92/TMDB-Movies-Data-Mining-Analysis/blob/b77bca0e97385b718f8c06801e6c8f6c0b21ef47/Graphic%20TMDB%20Movies%20Analysis.pdf))
 
 ## Final Report
 
