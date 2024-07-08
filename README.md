@@ -40,7 +40,7 @@ Our analysis revealed several key insights:
 - **Popularity**: Movies with higher popularity scores tend to generate higher revenue.
 - **Genres**: Certain genre combinations are more likely to result in profitable movies.
 
-## Comprehensive Visualization
+## Graphic on Findings
 
 ![Comprehensive Visualization](link-to-graphic)
 
