@@ -46,6 +46,6 @@ Our analysis revealed several key insights:
 
 ## Final Report
 
-For a detailed explanation of our analysis, findings, and additional visualizations, please refer to our ([Final-Report](https://github.com/MMomin92/TMDB-Movies-Data-Mining-Analysis/blob/847fa6991fee5b4231d4297ec78066529f93329a/Final%20Report%20TMDB%20Movies%20Analysis.pdf)).
+For a detailed explanation of our analysis, findings, and additional visualizations, please refer to our [Final-Report](https://github.com/MMomin92/TMDB-Movies-Data-Mining-Analysis/blob/847fa6991fee5b4231d4297ec78066529f93329a/Final%20Report%20TMDB%20Movies%20Analysis.pdf).
 
 
